@@ -22,11 +22,13 @@ class IssueCategoriesController < ApplicationController
   before_filter :find_project_from_association, :except => :new
   before_filter :find_project, :only => :new
   before_filter :authorize
+  before_filter :find_priorities
   
   verify :method => :post, :only => :destroy
 
   def new
     @category = @project.issue_categories.build(params[:category])
+	logger.debug "priority #{params[:priority]}"
     if request.post?
       if @category.save
         respond_to do |format|
@@ -85,5 +87,9 @@ private
     @project = Project.find(params[:project_id])
   rescue ActiveRecord::RecordNotFound
     render_404
+  end
+
+  def find_priorities
+	  @priorities = IssuePriority.all
   end
 end

@@ -81,7 +81,7 @@ class Issue < ActiveRecord::Base
     }
   }
 
-  before_create :default_assign
+  before_create :default_assign, :default_priority
   before_save :close_duplicates, :update_done_ratio_from_issue_status
   after_save :reschedule_following_issues, :update_nested_set_attributes, :update_parent_attributes, :create_journal
   after_destroy :update_parent_attributes
@@ -829,6 +829,13 @@ class Issue < ActiveRecord::Base
     if assigned_to.nil? && category && category.assigned_to
       self.assigned_to = category.assigned_to
     end
+  end
+
+  # Priority assignment based on category
+  def default_priority
+	if category && category.priority
+		self.priority = category.priority
+	end
   end
 
   # Updates start/due dates of following issues
